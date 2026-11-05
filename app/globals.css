@@ -1,26 +1,249 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Kara Sancak tasarım dili
+ * Tek tema: kara. Tek vurgu: bayrak kırmızısı (al). Köşeler her yerde keskin.
+ */
+@theme {
+  --color-ink: #0a0a0b;
+  --color-coal: #111113;
+  --color-ash: #19191c;
+  --color-steel: #232328;
+  --color-line: #2d2d33;
+  --color-smoke: #8f8f98;
+  --color-fog: #bcbcc3;
+  --color-bone: #f2f2ef;
+  --color-al: #e30a17;
+  --color-al-dark: #bb0812;
+  --color-al-bright: #ff4d57;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --ease-flag: cubic-bezier(0.16, 1, 0.3, 1);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-rise: rise 0.9s var(--ease-flag) both;
+
+  @keyframes marquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 28px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --font-display: var(--font-anton), "Arial Narrow", Impact, sans-serif;
+  --font-sans: var(--font-archivo), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-rune: var(--font-old-turkic), "Noto Sans Old Turkic", serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background: var(--color-ink);
+    scroll-behavior: smooth;
+    scrollbar-color: var(--color-line) var(--color-ink);
+  }
+
+  body {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-al);
+    color: var(--color-bone);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-bone);
+    outline-offset: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-smoke);
+  }
+
+  /* Tarih seçicinin ikonu koyu temada görünsün */
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}
+
+@layer components {
+  /* Afiş başlığı. Anton tek ağırlıklıdır, kalınlık eklenmez. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    /* Türkçe büyük harflerin noktaları (İ, Ü, Ö, Ş) üst satıra değmesin */
+    line-height: 1.12;
+    letter-spacing: 0.005em;
+  }
+
+  /* Kartal formasının çizgileri */
+  .stripes {
+    background-image: repeating-linear-gradient(
+      -62deg,
+      var(--color-bone) 0 var(--stripe, 10px),
+      var(--color-ink) var(--stripe, 10px) calc(var(--stripe, 10px) * 2)
+    );
+  }
+
+  .stripes-soft {
+    background-image: repeating-linear-gradient(
+      -62deg,
+      rgb(242 242 239 / 0.055) 0 var(--stripe, 22px),
+      transparent var(--stripe, 22px) calc(var(--stripe, 22px) * 2)
+    );
+  }
+
+  /* Üye görselleri arma biçimindedir */
+  .shield {
+    clip-path: polygon(50% 0, 100% 11%, 100% 60%, 88% 80%, 50% 100%, 12% 80%, 0 60%, 0 11%);
+  }
+
+  .panel {
+    background: var(--color-coal);
+    border: 1px solid var(--color-line);
+  }
+
+  .input {
+    display: block;
+    width: 100%;
+    background: var(--color-ink);
+    border: 1px solid var(--color-line);
+    color: var(--color-bone);
+    padding: 0.7rem 0.85rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    transition: border-color 0.2s;
+  }
+  .input:hover {
+    border-color: var(--color-smoke);
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--color-bone);
+    box-shadow: 0 0 0 1px var(--color-bone);
+  }
+  .input[aria-invalid="true"] {
+    border-color: var(--color-al-bright);
+  }
+  select.input {
+    appearance: none;
+    padding-right: 2.2rem;
+    background-image: linear-gradient(45deg, transparent 50%, var(--color-fog) 50%),
+      linear-gradient(135deg, var(--color-fog) 50%, transparent 50%);
+    background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+  }
+
+  /* Forum ve duyuru gövdesi */
+  .prose-ks p + p {
+    margin-top: 0.85em;
+  }
+  .prose-ks a {
+    color: var(--color-bone);
+    text-decoration: underline;
+    text-decoration-color: var(--color-al);
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+  }
+  .prose-ks a:hover {
+    color: var(--color-al-bright);
+  }
+}
+
+/* Görünür oldukça yükselen bölümler. Bkz. components/ui/reveal.tsx */
+[data-reveal="hidden"] {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+}
+[data-reveal="shown"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.85s var(--ease-flag) var(--reveal-delay, 0ms),
+    transform 0.85s var(--ease-flag) var(--reveal-delay, 0ms);
+}
+
+/* Kaydırma alanı temiz görünsün ama klavyeyle çalışmaya devam etsin */
+.scroll-clean {
+  scrollbar-width: none;
+}
+.scroll-clean::-webkit-scrollbar {
+  display: none;
+}
+
+/* İskelet yükleniyor animasyonu */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-ash) 25%, var(--color-steel) 50%, var(--color-ash) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-move 1.4s linear infinite;
+}
+@keyframes skeleton-move {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* XP bildirimi */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate3d(24px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.toast-in {
+  animation: toast-in 0.45s var(--ease-flag) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
